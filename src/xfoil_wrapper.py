@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 # Your XFOIL executable
 XFOIL_EXE = "/Users/ryanblanchard/myApplications/Xfoil/bin/xfoil"
-AIRFOIL_DB = '/Users/ryanblanchard/Documents/pedalplane/airfoils/'
-POLARS_DB = '/Users/ryanblanchard/Documents/pedalplane/airfoils/polars/'
+AIRFOIL_DB = '/Users/ryanblanchard/myApplications/pedalplane/airfoils/'
+POLARS_DB = '/Users/ryanblanchard/myApplications/pedalplane/airfoils/polars/'
 
 def plot_polar_contours(df: pd.DataFrame, nlevels=20, log_x=True, interpolate=False, eps=1e-8):
     """
