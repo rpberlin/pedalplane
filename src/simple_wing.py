@@ -1,12 +1,13 @@
 from xfoil_wrapper import run_xfoil
 from pint import Quantity as Q_
-airfoil = 'eppler387.dat'
+#airfoil = 'eppler387.dat'
+airfoil = 'dae11.dat'
 rho = Q_(1.22, 'kg/m^3')
 mu  = Q_(1.81e-5, "pascal*second")  #
 
-span   = Q_(7.0, "meter")
-chord  = Q_(2, "meter")
-aoa    = Q_(7.0, "degree")
+span   = Q_(9.0, "meter")
+chord  = Q_(1.5, "meter")
+aoa    = Q_(10.0, "degree")
 V_inf  = Q_(36.0, "kilometer / hour")  # 35 kph
 KE = 0.5 * rho * (V_inf**2)
 
@@ -30,4 +31,4 @@ Cm = float(result.get('Cm') or 0.0)
 Lift = (KE * A_wing * Cl).to('lbf') 
 Drag = (KE * A_wing * Cd).to('lbf')
 Power = (Drag* V_inf).to('W')
-print(Lift,Drag,Power)
+print(Lift,Drag,Power, Re)
