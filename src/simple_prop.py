@@ -146,8 +146,7 @@ if __name__ == "__main__":
         beta_shift = [0]*len(beta_angles)
         beta_shift[i] = delta_beta
         tmp_betas = np.array(beta_angles)+np.array(beta_shift)
-        for i, section in enumerate(prop.sections):
-            section.beta_deg = tmp_betas[i]
+        prop.set_beta_angles(tmp_betas)
         res = prop.evaluate_qprop(rpm=240,U_axial=speed,keep_dir=False)
         deffp_dbeta_list.append(res.summary['effprop']-res0.summary['effprop'])
         dThrust_dbeta.append(res.summary['T_N']-res0.summary['T_N'])
