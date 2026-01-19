@@ -36,7 +36,7 @@ if __name__ == "__main__":
     #    qprop_param_objs.append(qprop_param_dict)
     #    print(qprop_param_dict)
 
-    prop = Propeller(diameter_m = prop_diam.m_as('m'), hub_diameter_m = hub_diam.m_as('m'), n_blades=N_blades)
+    prop = Propeller(diameter_m = prop_diam.m_as('m'), hub_diameter_m = hub_diam.m_as('m'),chord_ref_m=chord_ref.m_as('m'), n_blades=N_blades)
 
 
 
