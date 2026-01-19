@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 
-airfoil_db_path = '/Users/ryanblanchard/Documents/pedalplane/airfoils/'
+airfoil_db_path = '/Users/ryanblanchard/myApplications/Xfoil/airfoils/'
 
 from typing import List, Callable
 import numpy as np
@@ -360,8 +360,8 @@ def offset_scale_and_rotate(spec_offset, suction_pts,pressure_pts,chord,alpha_de
 
 
 if __name__ == "__main__":
-    wingspan = 30
-    rootchord = 2 
+    wingspan = 17
+    rootchord = 1 
     halfspan_ratios = [0, .3,  .6, .8, 1.0]
     chord_ratios =    [1,  1 , .9, .8, .7] 
     twist_angles =    [6,  4,   3,  2,  1]
