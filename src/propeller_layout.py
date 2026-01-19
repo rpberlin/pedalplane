@@ -11,6 +11,10 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union, Any
 QPROP_EXE = "/Users/ryanblanchard/myApplications/Qprop/bin/qprop"
 
 
+def optimize_for_static_thrust(prop):
+    opt_prop = prop
+    return opt_prop
+
 
 Number = Union[int, float]
 _FLOAT = r"[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?"
@@ -79,6 +83,7 @@ class PropSection:
 class Propeller:
     diameter_m: float
     hub_diameter_m: float
+    chord_ref_m: float
     n_blades: int
     sections: List[PropSection] = field(default_factory=list)
 
@@ -116,6 +121,21 @@ class Propeller:
                 airfoil_name=str(airfoil_name),
             )
         )
+
+    def set_beta_angles(self,beta_angle_list):
+        if len(beta_angle_list) != len(self.sections):
+            raise ValueError("length of beta angles must equal number of secitons.")
+        for i, section in enumerate(self.sections):
+            section.beta_deg = beta_angle_list[i]
+        return
+    
+    def set_chord_fractions(self,chord_fractions_list):
+        if len(chord_fractions_list) != len(self.sections):
+            raise ValueError("length of beta angles must equal number of secitons.")
+        for i, section in enumerate(self.sections):
+            section.chord_m = chord_fractions_list[i]*self.chord_ref_m
+        return
+
 
     def validate(self) -> None:
         if not self.sections:
