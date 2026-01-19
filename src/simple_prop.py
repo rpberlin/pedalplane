@@ -7,12 +7,12 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    prop_diam = Q_(2.0,'m')
+    prop_diam = Q_(1.0,'m')
     hub_diam = Q_(0.2,'m') 
     prop_R = 0.5*prop_diam
     hub_R = 0.5*hub_diam
     N_blades =  2
-    chord_ref =  Q_(15,'cm') 
+    chord_ref =  Q_(5,'cm') 
     rho_ref = Q_(1.225,'kg/m^3') 
     U_axial = Q_(0,'m/s')
     mu_ref = Q_(1.18e-5,'Pa*s')
@@ -22,19 +22,18 @@ if __name__ == "__main__":
 
     
 
-    radius_ratios = [0, .3,  0.4, .6, .8, 0.98] #0 
-    chord_ratios =    [0.7, 0.8, .9 , .9, .6, .4] 
-    beta_angles =    [45,  28, 24,  16,  13,  8]
+    #radius_ratios = [0, .2,  0.4, .6, .8, 0.98] #0 
+    #chord_ratios =    [0.7, 0.8, .9 , .9, .6, .4] 
+    #beta_angles =    [45,  25, 25,  25,  25,  20]
     #Re_ref = (rho_ref*U_mag_ref*chord_ref/mu_ref).to('')
     Re_ref = 1e5
-    airfoil_names = ['dae11.dat','dae21.dat','eppler387.dat','dae31.dat','dae41.dat','dae51.dat']
+    #airfoil_names = ['dae11.dat','dae21.dat','dae31.dat','dae41.dat','dae51.dat']
+    #airfoil_names = 4*['eppler387.dat']
+    radius_ratios = [0,0.35,0.65,0.98]
+    chord_ratios  = 4*[1.0]
+    beta_angles = 4*[35.0]
+    airfoil_names = 4*['dae21.dat']
 
-
-    #qprop_param_objs = []
-    #for i, airfoil_name in enumerate(airfoil_names):
-    #    qprop_param_dict = get_qprop_fit_params(airfoil_name, Re_ref, False)
-    #    qprop_param_objs.append(qprop_param_dict)
-    #    print(qprop_param_dict)
 
     prop = Propeller(diameter_m = prop_diam.m_as('m'), hub_diameter_m = hub_diam.m_as('m'),chord_ref_m=chord_ref.m_as('m'), n_blades=N_blades)
 
@@ -49,9 +48,27 @@ if __name__ == "__main__":
             af_fit=fit,
             airfoil_name=name,   # optional label
         )
+ 
+    T0,rpm0 = prop.calc_thrust_and_rpm_from_power(1,0)
+    res0 = prop.evaluate_qprop(rpm=rpm0, U_axial=0.0,keep_dir=False)
+    opt_output = prop.maximize_static_thrust(power=1, U_axial=0)
+    T1,rpm1 = prop.calc_thrust_and_rpm_from_power(1,0)
+    best_res = prop.evaluate_qprop(rpm=rpm1, U_axial=0.0,keep_dir=False)
 
-    res = prop.evaluate_qprop(rpm=1000.0, U_axial=0.0,keep_dir=False)
-    print(res.T_N, res.Q_Nm, res.P_shaft_W)
+
+    radial_plotlist = ['beta','chord','Cl','Cd','effp','Mach']
+    color_key = ['r','g','b','k','m', 'c']
+    for i, plt_qty in enumerate(radial_plotlist):
+        plt.subplot(1,len(radial_plotlist),i+1)
+        plt.plot(res0.radial['radius'],res0.radial[plt_qty],'r',label=f'base @ {rpm0:.0f} rpm')
+        plt.plot(best_res.radial['radius'],best_res.radial[plt_qty],'b',label=f'opt @ {rpm1:.0f} rpm')
+        if 'eff' in plt_qty:
+            plt.ylim([0,1])
+        plt.xlabel('Radial Position (m)')
+        plt.legend()
+        plt.ylabel(plt_qty)
+        plt.title(plt_qty)
+    plt.show()
 
     thrust_list = []
     torque_list = []
@@ -122,8 +139,7 @@ if __name__ == "__main__":
     plt.title('Propulsive Efficiency vs Advance Ratio')
     plt.show()
 
-    radial_plotlist = ['beta','chord','Cl','Cd','effp','Mach']
-    color_key = ['r','g','b','k','m', 'c']
+
     for i, plt_qty in enumerate(radial_plotlist):
         plt.subplot(1,len(radial_plotlist),i+1)
         plt.plot(res.radial['radius'],res.radial[plt_qty],color_key[i])
@@ -161,7 +177,7 @@ if __name__ == "__main__":
     best_i = 0
     best_betashift  = None
     best_res = None
-    isweep = range(10,500,10)
+    isweep = range(2,25,2)
     for i in isweep:
         beta_shift = i*np.array(deffp_dbeta_list)
         tmp_betas = np.array(beta_angles)+np.array(beta_shift)
@@ -181,6 +197,8 @@ if __name__ == "__main__":
             best_res = res
             best_thrust = tmp_thrust
             best_shaftpower = tmp_shaftpower
+
+
 
 
     print(deffp_dbeta_list,dThrust_dbeta)
