@@ -13,15 +13,6 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union, Any
 
 QPROP_EXE = "/Users/ryanblanchard/myApplications/Qprop/bin/qprop"
 
-<<<<<<< HEAD
-
-def optimize_for_static_thrust(prop):
-    opt_prop = prop
-    return opt_prop
-
-
-=======
->>>>>>> 2b7604690f084d7050ca2f32a61c94859907b18e
 Number = Union[int, float]
 _FLOAT = r"[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?"
 
@@ -128,7 +119,6 @@ class Propeller:
             )
         )
 
-<<<<<<< HEAD
     def set_beta_angles(self,beta_angle_list):
         if len(beta_angle_list) != len(self.sections):
             raise ValueError("length of beta angles must equal number of secitons.")
@@ -144,96 +134,6 @@ class Propeller:
         return
 
 
-=======
-
-    def getXparamsfromProp(self):
-        beta_angles = []
-        chord_ratios = []
-        radius_ratios = []
-        for section in self.sections:
-            beta, chord, radius = section.beta_deg,  section.chord_m, section.r_m
-            chord_ratio = chord/self.chord_ref_m
-            radius_ratio = (radius-self.hub_radius_m)/(self.radius_m - self.hub_radius_m)
-            beta_angles.append(beta/100)
-            chord_ratios.append(chord_ratio)
-            radius_ratios.append(radius_ratio)
-        x = beta_angles + chord_ratios + radius_ratios[1:-1]
-        return x
-
-
-    def setParamsfromX(self,X):
-        nParamsIn = len(X)
-        n_sections = len(self.sections)
-        i0_chord_ratios = n_sections
-        i0_radius_ratios = 2*n_sections
-        nPropParams = 3*n_sections-2 #the first and last radius ratios canot be changed
-        if nParamsIn != nPropParams:
-            raise ValueError("Mismatch on parameters")
-        for i, section in enumerate(self.sections):
-            section.beta_deg = 100*X[i]
-            section.chord_m = self.chord_ref_m * X[i0_chord_ratios+i]
-            if i >0 and i<n_sections-1:
-                section.radius_m = self.hub_radius_m + X[i0_radius_ratios+i-1]*(self.radius_m - self.hub_radius_m)
-        return
-    
-    def print_section_summaries(self):
-        print('idx \tr/R\tR (m) \tbeta (deg) \tchord (m) \tchrd_rat\tName')
-        for i, section in enumerate(self.sections):
-            r_ratio = (section.r_m-self.hub_radius_m)/(self.radius_m - self.hub_radius_m)
-            chord_ratio = section.chord_m/self.chord_ref_m
-            print(f'{i:d} \t{r_ratio:.3f} \t{   section.r_m:.3f} \t{section.beta_deg:.2f} \t{section.chord_m:.3f}\t{chord_ratio:.3f} \t{section.airfoil_name} ')
-    
-    def maximize_static_thrust(self, power=300, U_axial = 10):
-        x0 = self.getXparamsfromProp()
-        res = minimize(
-            self.neg_thrust_sim_standalone,
-            x0,
-            args=(power, 0.0),      # power, Uaxial
-            method="nelder-mead",
-            options={
-                "disp": True,
-                "eps": 1e-1,
-                "maxiter": 200
-                }
-        )
-        return res
-    
-    def calc_thrust_and_rpm_from_power(self, power=300,U_axial=100, max_iter =200):
-        rpm0 = 1000
-        urf = 0.8
-        tol = 0.0001
-        it = 0
-        res0 = self.evaluate_qprop(rpm=rpm0,U_axial=U_axial,keep_dir=False)
-        pow0 = res0.P_shaft_W
-        err = np.abs(pow0-power)
-        while err > tol and it < max_iter:
-            #print(it,rpm0,pow0,err)
-            rpmstar = rpm0*(power/pow0) ** (1/3)
-            rpm0 = rpm0*(1-urf) + rpmstar*urf
-            res0 = self.evaluate_qprop(rpm=rpm0,U_axial=U_axial,keep_dir=False)
-            pow0 = res0.P_shaft_W
-            err = np.abs((pow0-power)/power)
-            it = it +1
-        thrust = res0.T_N
-        print(f'Thrust: {thrust:.4f}')
-        return thrust, rpm0
-            
-
-
-        
-   
-    def neg_thrust_sim_standalone(self, X, power=100, U_axial=100):
-        try:
-            self.setParamsfromX(X)
-            #res = self.evaluate_qprop(rpm=rpm, U_axial=Uaxial, keep_dir=False)
-            thrust, rpm = self.calc_thrust_and_rpm_from_power(power=power,U_axial=U_axial)
-            #print("funCalled:", thrust, rpm, X)
-            return -thrust
-        except Exception:
-            print("Failed: ", X)
-            return 1e9
-
->>>>>>> 2b7604690f084d7050ca2f32a61c94859907b18e
     def validate(self) -> None:
         if not self.sections:
             raise ValueError("Propeller has no sections.")
